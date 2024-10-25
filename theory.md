@@ -1,5 +1,7 @@
 # AlphaFold-Metainference theory
 
+More information about AlphaFold-Metainference can be found [here](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full)
+
 ***AlphaFold distance map prediction.*** Average inter-residue distances of disordered proteins
 can be predicted through the distogram head of AlphaFold using this colab [notebook](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb). These
 distances are defined as those between the β carbon atom positions for
@@ -23,15 +25,15 @@ $\hat{d_{ij}}=\sum_{b=1}^{64} d^{b} p_{ij}^{b} $
 
 where $d^{b}$ represents the central value of bin $b$.
 
-***Metainference*.** Metainference is a Bayesian inference method that
+***Metainference*.** [Metainference](https://doi.org/10.1126/sciadv.1501177) is a Bayesian inference method that
 enables the determination of structural ensembles by combining prior
 information and experimental data according to the maximum entropy
-principle^23^. In this work, we implemented this method by using the
+principle. In AF-MI,  Metainference is implemented by using the
 distance matrix $\mathbf{d}^{AF}$ predicted by AlphaFold as
 pseudo-experimental data. By design, metainference can disentangle
 structural heterogeneity from systematic errors, such as force field or
 forward model inaccuracies, random errors in the data, and errors due to
-the limited sample size of the ensemble^23^. The molecular simulations
+the limited sample size of the ensemble. The molecular simulations
 are carried out according to the metainference energy function,
 $E = - k_{B}T\log\left( p_{MI} \right)$, where $k_{B}$ is the Boltzmann
 constant, *T* is the temperature, and $p_{MI}$ is the metainference,
