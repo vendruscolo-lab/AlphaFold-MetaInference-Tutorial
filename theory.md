@@ -151,3 +151,5 @@ simulation can be found in (Github
 efficiently the conformational space of disordered proteins using
 average inter-residue distances predicted by AlphaFold as structural
 +-->
+
+##### [Back to AlphaFold-Metainference home](NAVIGATION.md)
