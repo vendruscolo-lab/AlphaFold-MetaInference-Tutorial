@@ -11,12 +11,8 @@ Due to the interplay between well folded domains and disordered regions, TDP-43 
   <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy). Noted the low PLDDT score in the dirordered C-terminal region 274-414 as well as in the linkers between folded domains, signifying inaccuracy of AF structure prediction in such dynamic regions. </em>
 </p>
 
-In this tutorial, we start with the AF predicted structure of TDP-43 WtoA, employ CALVADOS-2 coarse grained forcefield while adding RMSD restraints to maintain the folded domains and use AF inter-residue distances as restraints within the Metainference framework. 
+In this tutorial, we start with the AF predicted structure of TDP-43 WtoA, employ CALVADOS-2 coarse grained forcefield while adding RMSD restraints to maintain the folded domains and use AF inter-residue distances as restraints within the Metainference framework. We then generate the unbiased structural ensemble, by properly accounting the MetaD bias, followed by ploting free energy surface along different collective variables, and calculation of the secondary structure elements and RMSF.  
 
-The advantages of AF-MI rely in three main points
-* The possibility to use a coarse grained model and a Metadynamics bias that speeds up the conformational sampling.
-* The integration in the structural ensemble generation of information rich information for partially disordered proteins such as AF inter-residue distances.  
 
-In so doing we are able to reach on consumer-level hardware orders of magnitude better speed performances than all-atom potentials, allowing us to run on a workstation the entire tutorial in around 5 hrs. 
 
 ##### [Back to AlphaFold-Metainference home](NAVIGATION.md)
