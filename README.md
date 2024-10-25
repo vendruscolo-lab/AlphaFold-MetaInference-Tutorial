@@ -1,7 +1,7 @@
 # AlphaFold-Metainference tutorial
 A tutorial to setup and run AlphaFold-Metainference simulations. The original work which explains the theory for AlphaFold-Metainference (AF-MI) can be found [here](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full). 
 
-The tutorial comprises the following sections
+The tutorial comprises the following sections:
 
 #### AlphaFold-Metainference theory
 A brief introduction to the theory and advantage in using AlphaFold-Metainference.
