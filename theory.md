@@ -77,6 +77,14 @@ perturbation of the Gibbs sampling was 0.1. For more information on how to selec
 the limited number of replicas used to estimate the forward model
 ($σ^{SEM}$) was calculated on the fly by window averaging every 200 steps
 of molecular dynamics.
+
+
+**AF-MI advantages**
+
+By combining AlphaFold inter-resiude distance data with the CALVADOS-2 forcefield to retrieve structural ensembles of proteins are: 
+- The high convergence speed due to the coarse grained model and a metadynamics bias
+- The increased accuracy in modeling partially ordered protein interactions relyig on the introduction of AlphaFold-based distance restraints 
+
 <!--+
 **AlphaFold predicted distance selection used as restraints in AlphaFold
 metainference.** In Fig.SX1 plot the inter-residue AlphaFold predicted
