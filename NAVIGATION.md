@@ -16,7 +16,7 @@ We will discuss all the preliminary steps to set up AF-MI, from generating the A
 #### [Structural ensemble generation and post-processing analysis](postprocessig.md)
 Finally, we will discuss how to generate the unbiased structural ensemble of TDP-43, estimate free energy surfaces along collective variables (CVs) and predict ensemble averaged properties such as secondary structureand RMSF.
 
-___NB:___ This tutorial assumes that you know metadynamics theory and practice in PLUMED (if not, a good start can be the [PLUMED tutorial](https://www.plumed-tutorials.org/lessons/21/004/data/NAVIGATION.html) about it).
+___NB:___ This tutorial assumes that you know metadynamics theory and practice in PLUMED (if not, please visit [PLUMED tutorial](https://www.plumed-tutorials.org/lessons/21/004/data/NAVIGATION.html)).
 
 
 ```mermaid
