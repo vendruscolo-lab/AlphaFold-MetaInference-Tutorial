@@ -7,7 +7,7 @@ The tutorial comprises the following sections:
 #### [AlphaFold-Metainference theory](theory.md)
 A brief introduction to the theory and advantage in using AlphaFold-Metainference.
 
-#### [Case study: TDP-43 monomer dynamics](case_study.md)
+#### [Case study: TDP-43 WtoA monomer dynamics](case_study.md)
 We will present the case study for this tutorial, the DNA/RNA processing protein TDP-43 which undergoes both functional and pathogennic aggregation in amyotrophic lateral sclerosis (ALS) and other neurodegenerative conditions. To enable a rapid structural ensemble generation on a laptop/workstation, AF-MI is coupled to the CALVADOS-2 coarse-grained forcefield.
 
 #### [Input files preparation](input.md)
