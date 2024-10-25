@@ -6,9 +6,9 @@ Due to the interplay between well folded domains and disordered regions, TDP-43 
 
 
 <p align="center">
-  <img src="https://github.com/riccardocapelli/VMetaD-tutorial/blob/main/img/lys_render.jpg?raw=true" alt="Alt text" width="25%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/img/TDP-43WtoA.pdf?raw=true" alt="Alt text" width="25%">
   <br>
-  <em>Render of the Lysozyme:benzene in cartoon representation. In dark gray we can see the N-terminal domain, in blue the C-terminal domain, where in red we can see benzene in its binding pocket.</em>
+  <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy).</em>
 </p>
 
 In this tutorial, we will use a structure based on the PDB ID [1L84](https://www.rcsb.org/structure/1L84). The force field used is multi-eGO, a structure-based potential generated via a bayesian approach, trained on all-atom simulations performed with the DES-Amber force field (details in [this paper](https://doi.org/10.26434/chemrxiv-2024-jcmgc)). 
