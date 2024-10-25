@@ -6,7 +6,7 @@ Due to the interplay between well folded domains and disordered regions, TDP-43 
 
 
 <p align="center">
-  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/img/TDP-43WtoA.pdf?raw=true" alt="Alt text" width="25%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/TDP-43WtoA.jpg?raw=true" alt="Alt text" width="45%">
   <br>
   <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy).</em>
 </p>
