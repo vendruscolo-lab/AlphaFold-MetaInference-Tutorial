@@ -77,7 +77,7 @@ perturbation of the Gibbs sampling was 0.1. For more information on how to selec
 the limited number of replicas used to estimate the forward model
 ($σ^{SEM}$) was calculated on the fly by window averaging every 200 steps
 of molecular dynamics.
-
+<!--+
 **AlphaFold predicted distance selection used as restraints in AlphaFold
 metainference.** In Fig.SX1 plot the inter-residue AlphaFold predicted
 distance maps corresponding to the systems presented in the main text.
@@ -142,3 +142,4 @@ simulation can be found in (Github
 ***Generation of structural ensembles using metainference.*** To sample
 efficiently the conformational space of disordered proteins using
 average inter-residue distances predicted by AlphaFold as structural
++-->
