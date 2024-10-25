@@ -1,4 +1,12 @@
-# AlphaFold-Metainference theory
+# AlphaFold-Metainference 
+### Context
+
+The application of deep learning methods to the protein folding problem has transformed our ability to generate accurate models of the native states of proteins from the knowledge of their amino acid sequences. The initial predictions of the native structures of proteins have also been recently extended to protein complexes. These advances have prompted the question of whether it is possible to use this type of approach for the prediction of the conformational fluctuations of the native states of folded proteins, and more generally for the characterisation of the structural properties of the native states of disordered proteins. Support for this idea comes from the observation that AlphaFold performs as well as current state-of-the-art predictors of protein disorder. It has also been reported that the predicted aligned error (PAE) maps from AlphaFold are correlated with the distance variation matrices from molecular dynamics simulations, suggesting that AlphaFold provides information about the dynamics of proteins in addition to their structures.
+
+Since the native states of disordered proteins can be represented in terms of ensembles of conformations with statistical weights obeying the Boltzmann distribution, a relevant goal is to extend AlphaFold to predict structural ensembles of partially disordered proteins. In this work, we propose an approach to perform this task by basing this approach on the observation that AlphaFold can predict inter-residue distances even for disordered proteins, despite having been trained on folded proteins and combining such information with molecular dynamics within the Metainference framework.
+
+
+### Theory
 
 More information about AlphaFold-Metainference can be found [here](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full)
 
