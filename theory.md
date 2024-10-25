@@ -44,38 +44,38 @@ $p_{MI}\left( \mathbf{X},\sigma^{SEM},\sigma^{B} \right|\mathbf{D}) = \ \prod_{r
 
 In this formula, **X** denotes the vector comprising the atomic
 coordinates of the structural ensemble, consisting of individual
-replicas X~r~ (N~R~ in total), σ^SEM^ the error associated to the
-limited number of replicas in the ensemble, σ~B~ the random and
+replicas $X_r$ ($N_R$ in total), $σ^{SEM}$ the error associated to the
+limited number of replicas in the ensemble, $σ_B$ the random and
 systematic errors in the prior molecular dynamics forcefield as well as
 in the forward model and the data, and $\mathbf{d}^{AF}$ the AF distance
-matrix. Note that σ^SEM^ is calculated for each data point (σ~i~^SEM^),
-while σ^B^ is computed for each data point *i* and replica *r* as
-σ~r,i~^B^. The functional form of the likelihood
-p($\mathbf{d}^{AF}$\|**X**, σ~i~^SEM^ , σ~r,i~^B^) is a Gaussian
+matrix. Note that $σ^{SEM}$ is calculated for each data point ($σ_i^{SEM}$),
+while $σ^B$ is computed for each data point *i* and replica *r* as
+$σ_{r,i}^B$. The functional form of the likelihood
+$p(\mathbf{d}^{AF}\|\mathbf{X}, σ_i^{SEM} , σ_{r,i}^B)$ is a Gaussian
 function
 
 $$p(\mathbf{d}^{AF}\mathbf{|\ X},\sigma_{i}^{SEM},\sigma_{r,i}^{Β}) = \frac{1}{\sqrt{2\pi}\ \sqrt{\left( \sigma_{r,i}^{Β} \right)^{2} + \left( \sigma_{i}^{SEM} \right)^{2}}}exp\left\lceil - \frac{1}{2}\frac{\left\lbrack d_{i,j}^{AF} - d_{ij}\left( \mathbf{X} \right) \right\rbrack^{2}}{\left( \sigma_{r,i}^{Β} \right)^{2} + \left( \sigma_{i}^{SEM} \right)^{2}} \right\rceil\ \ \ (4)$$
 
-where d~i,j~(X) represents the forward model for data point *i,j,*
+where $d_{i,j}(X)$ represents the forward model for data point *i,j,*
 namely the *i,j* distance calculated in the ensemble. For multiple
 replicas, the metainference energy function is
 
 $$E_{MI}\left( \mathbf{X},\sigma \right) = E_{MD}\left( \mathbf{X} \right) + \frac{k_{B}T}{2}\sum_{r,i}^{N_{R},N_{D}}\frac{\left\lbrack d_{i} - f_{i}\left( X_{r} \right) \right\rbrack^{2}}{\left( \sigma_{r,i}^{Β} \right)^{2} + \left( \sigma_{i}^{SEM} \right)^{2}} + E_{\sigma}\ \ \ (5)$$
 
-where E~σ~ corresponds to the energy term associated with the errors
+where $E_σ$ corresponds to the energy term associated with the errors
 
 $$E_{\sigma} = k_{B}T\sum_{r,i}^{N_{R},N_{D}}{- \log{\left( \sigma_{r,i}^{Β} \right) + \frac{1}{2}}\log\left\lbrack \left( \sigma_{r,i}^{Β} \right)^{2} + \left( \sigma_{i}^{SEM} \right)^{2} \right\rbrack}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (6).$$
 
-Finally, E~MD~ corresponds to the potential energy function of the
+Finally, $E_{MD}$ corresponds to the potential energy function of the
 molecular dynamics force field, which in this case is the CALVADOS-2
-force field^44^. While the space of conformations X~r~ is sampled
-through multi-replica simulations (in this study we used six replicas)
-the error parameters for each datapoint σ~r,i~^B^ are sampled through a
-Gibbs sampling scheme at each time step^23^. The range of the error
-sampling was \[0.0001,10\] and the associated trial move error
-perturbation of the Gibbs sampling was 0.1. The error parameter due to
+force field. While the space of conformations $X_r$ is sampled
+through multi-replica simulations (in this tutorial we used six replicas, however the larger this number the better)
+the error parameters for each datapoint $σ_{r,i}^B$ are sampled through a
+Gibbs sampling scheme at each time step. The range of the error
+sampling in this tutorial is set to\[0.0001,10\] and the associated trial move error
+perturbation of the Gibbs sampling was 0.1. For more information on how to select these parameters, refer [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). The error parameter due to
 the limited number of replicas used to estimate the forward model
-(σ^SEM^) was calculated on the fly by window averaging every 200 steps
+($σ^{SEM}$) was calculated on the fly by window averaging every 200 steps
 of molecular dynamics.
 
 **AlphaFold predicted distance selection used as restraints in AlphaFold
