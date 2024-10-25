@@ -18,6 +18,7 @@ ${\widehat{d}}_{ij}$ and the standard deviation $\sigma_{ij}$ of the
 predicted distribution of the distances between residue $i$ and $j$ are
 calculated by
 + -->
+#\[ \hat{d}_{ij}\sum_{b=1}^{\64} d^{b} p_{ij}ˆb \]#
 
 $(d ̂_{ij}= ∑_(b=1)^64 d^b  p_{ij}^b  )$
 
