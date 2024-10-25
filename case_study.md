@@ -8,7 +8,7 @@ Due to the interplay between well folded domains and disordered regions, TDP-43 
 <p align="center">
   <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/TDP-43WtoA.jpg?raw=true" alt="Alt text" width="45%">
   <br>
-  <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy).</em>
+  <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy). Noted the low PLDDT score in the dirordered C-terminal region 274-414 as well as in the linkers between folded domains, signifying inaccuracy of AF structure prediction in such dynamic regions. </em>
 </p>
 
 In this tutorial, we will use a structure based on the PDB ID [1L84](https://www.rcsb.org/structure/1L84). The force field used is multi-eGO, a structure-based potential generated via a bayesian approach, trained on all-atom simulations performed with the DES-Amber force field (details in [this paper](https://doi.org/10.26434/chemrxiv-2024-jcmgc)). 
