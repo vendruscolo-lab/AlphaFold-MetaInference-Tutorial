@@ -11,12 +11,12 @@ Due to the interplay between well folded domains and disordered regions, TDP-43 
   <em>Render of the TDP-43WtoA AlphaFold structure. Plddt structure prediction accuracy score spans from blue (high accuracy) to red (low accuracy). Noted the low PLDDT score in the dirordered C-terminal region 274-414 as well as in the linkers between folded domains, signifying inaccuracy of AF structure prediction in such dynamic regions. </em>
 </p>
 
-In this tutorial, we will use a structure based on the PDB ID [1L84](https://www.rcsb.org/structure/1L84). The force field used is multi-eGO, a structure-based potential generated via a bayesian approach, trained on all-atom simulations performed with the DES-Amber force field (details in [this paper](https://doi.org/10.26434/chemrxiv-2024-jcmgc)). 
-The advantages of multi-eGO rely in three main points
-* The possibility to use 5 fs time steps: multi-eGO implements a united-atom coarse-graining, which removes hydrogens;
-* Absence of coulombian interactions for electrostatics: in multi-eGO, all the non-bonded interactions are included in a Lennard-Jones potential;
-* Implicit solvation: multi-eGO does not have an explicit solvent, resulting in ~10x less particles in the simulation box.
+In this tutorial, we start with the AF predicted structure of TDP-43 WtoA, employ CALVADOS-2 coarse grained forcefield while adding RMSD restraints to maintain the folded domains and use AF inter-residue distances as restraints within the Metainference framework. 
 
-Using this potential we are able to reach on consumer-level hardware the same performances of a HPC machine on all-atom potentials, allowing us to run on a workstation the entire tutorial in around 24 h. 
+The advantages of AF-MI rely in three main points
+* The possibility to use a coarse grained model and a Metadynamics bias that speeds up the conformational sampling.
+* The integration in the structural ensemble generation of information rich information for partially disordered proteins such as AF inter-residue distances.  
+
+In so doing we are able to reach on consumer-level hardware orders of magnitude better speed performances than all-atom potentials, allowing us to run on a workstation the entire tutorial in around 5 hrs. 
 
 ##### [Back to AlphaFold-Metainference home](NAVIGATION.md)
