@@ -1,26 +1,25 @@
 # AlphaFold-Metainference theory
 
- <!-- +
-***AlphaFold.*** Average inter-residue distances of disordered proteins
-were predicted through the distogram head of AlphaFold^1^. These
+***AlphaFold distance map prediction.*** Average inter-residue distances of disordered proteins
+can be predicted through the distogram head of AlphaFold using this colab [notebook](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb). These
 distances are defined as those between the β carbon atom positions for
 all amino acids except glycine, for which the α carbon atom positions
 were instead used. The multiple sequence alignment (MSA) was conducted
-by MMseqs2^42^ (default setting) on BFD/MGnify^3^ and Uniclust30^43^.
-Model 1.1.1 of AlphaFold (default setting)^1^ was used for the
+by MMseqs2 (default setting) on BFD/MGnify and Uniclust30.
+Model 1.1.1 of AlphaFold (default setting) was used for the
 predictions, with no structural templates. AlphaFold describes the
 distribution of inter-residue distances into 64 bins of equal width,
 covering the range from 2.15625 to 21.84375 Å, with the last bin also
 including distances longer than 21.84375 Å. For each pair of residues
 ($i$ and $j$), AlphaFold predicts the probability $p_{ij}^{b}$ that
 their distance is within bin $b$. The predicted distance
-${\widehat{d}}_{ij}$ and the standard deviation $\sigma_{ij}$ of the
+${\widehat{d}}_{ij}$ of the
 predicted distribution of the distances between residue $i$ and $j$ are
-calculated by
-+ -->
-$\[ \hat{d}_{ij}\sum_{b=1}^{\64} d^{b} p_{ij}ˆb \]$
+esimated as
 
-#$(d ̂_{ij}= ∑_(b=1)^64 d^b  p_{ij}^b  )$
+
+$\hat{d_{ij}}=\sum_{b=1}^{64} d^{b} p_{ij}^{b} $
+
 
 where $d^{b}$ represents the central value of bin $b$.
 
