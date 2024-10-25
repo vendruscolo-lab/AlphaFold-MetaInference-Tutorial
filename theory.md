@@ -19,7 +19,7 @@ predicted distribution of the distances between residue $i$ and $j$ are
 calculated by
 + -->
 
-$█(d ̂_ij= ∑_(b=1)^64▒d^b  p_ij^b  #(1) )$
+$(d ̂_{ij}= ∑_(b=1)^64 d^b  p_{ij}^b  )$
 
 where $d^{b}$ represents the central value of bin $b$.
 
