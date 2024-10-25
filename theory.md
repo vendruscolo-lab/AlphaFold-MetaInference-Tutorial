@@ -1,5 +1,6 @@
-**Methods**
+# AlphaFold-Metainference theory
 
+ <!-- +
 ***AlphaFold.*** Average inter-residue distances of disordered proteins
 were predicted through the distogram head of AlphaFold^1^. These
 distances are defined as those between the β carbon atom positions for
@@ -16,10 +17,13 @@ their distance is within bin $b$. The predicted distance
 ${\widehat{d}}_{ij}$ and the standard deviation $\sigma_{ij}$ of the
 predicted distribution of the distances between residue $i$ and $j$ are
 calculated by
++ -->
 
-$$\begin{array}{r}
+$$
+\begin{array}{r}
 {\widehat{d}}_{ij} = \ \sum_{b = 1}^{64}d^{b}p_{ij}^{b}\ \#(1)
-\end{array}$$
+\end{array}
+$$
 
 $$\begin{array}{r}
 \sigma_{ij} = \ \sqrt{\sum_{b = 1}^{64}\left( d^{b} - {\widehat{d}}_{ij} \right)^{2}p_{ij}^{b}}\ \#(2)
