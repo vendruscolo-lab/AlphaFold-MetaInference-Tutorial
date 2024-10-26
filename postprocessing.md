@@ -1,9 +1,9 @@
 
-# Analysis
+## Analysis
 
+Copy relevant scripts in the analysis folder
 ```python
 !cp ../scripts_prep/* .
-
 !zip files.zip script.sh  pulchra.sh pulchra.py  backmap.py simulate*.py  dcd2xtc.py plumed_analysis.dat reconstruct.dat  resample.py  fes2.py  sequence.dat plumed.dat struct*pdb input_af.pdb r1_excl.pkl forcefield.xml residues.csv *npy *mean*csv pdb_af.pdb  keepH.sh
 
 !mkdir analysis
@@ -12,6 +12,14 @@ os.chdir(dir+"/analysis")
 !unzip files.zip
 ```
 
+Run the ```script.sh``` which performs
+- Convert dcds to xtc (dcd2xtc.py)
+- Concatenate xtcs to a single xtc ```gmx trjcat -f nosolv_*.xtc -cat -o cat_trjcat.xtc -settime```
+- Calculate the Torrie-Valeau weights (Fullbias.dat) and the CVs (COLVAR) ```plumed driver --plumed plumed_analysis.dat --mf_xtc cat_trjcat.xtc``` which are afterwards used to calculate Free Energy Surfaces.
+- Generate a structural ensemble by sampling the concatenated trajectory by weights. ```python resample.py```
+- Backmap coarse grained structural ensemble by using PULCHRA```python backmap.py $nrep 
+sh pulchra.sh
+sh keepH.sh```
 
 ```python
 !pwd
