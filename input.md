@@ -64,7 +64,7 @@ os.chdir(home)
 !git clone https://github.com/vendruscolo-lab/AlphaFold-IDP
 os.chdir(home+'/AlphaFold-IDP/prep_run')
 ```
-In the following step we need to define ```python fasta_sequence, pH, temp, ionic, PAE_cut, Pr_cut, NR, ordered_domains, disordered_domains```
+In the following step we need to define ```python fasta_sequence, pH, temp, ionic, PAE_cut, NR, ordered_domains, disordered_domains, pdb_af,json_af,npy_af, mean_af```. These variables respectively stand for the protein sequence to be simulated in AF-MI, the simulation pH, the simulation temperature (in K), the ionic strength of the solution, the highest AF predicted alighment error the considered inter-residue distances will have (residue distances with higher PAE are not considered in restraints), the number of replicas, the regions of the ordered domains (regions of more than 3 residues with PLDDT>0.75) where RMSD walls wil be used, the disordered regions (usually regions of more than 3 residues with PLDDT<0.75), AF predicted pdb file, AF predicted json containing the PAE per residue pair file, per residue pair probability distribution AF prediction file, mean AF inter-residue distance map prediction file  
 
 ```python
 import shutil
@@ -78,7 +78,6 @@ pH=7.4
 temp=298
 ionic=0.2
 PAE_cut=5
-Pr_cut=0.2
 NR=2
 #Decide the plddt based ordered (od) and disordered (dd) regions
 ordered_domains = {'od1': [3, 79], 'od2': [104,178],'od3':[191,260]}
@@ -123,13 +122,15 @@ os.system(f'python {path_gen_xml}')
 
 
 ```
+Run AF-MI
+
 ```python
 #Make plumed files.
 #Copy and run the prep script that makes the plumed file.
 #The Collective variables (CVs) in these case are chosen to be the torsion angles between structured domains.
 import subprocess
 shutil.copy2(dir+"/../scripts_prep/make_plumed_distmat.py", dir)
-subprocess.run(['python', str(dir)+'/make_plumed_distmat.py', 'sequence.dat',str(PAE_cut), str(Pr_cut)], capture_output=True, text=True)
+subprocess.run(['python', str(dir)+'/make_plumed_distmat.py', 'sequence.dat',str(PAE_cut), '0.2'], capture_output=True, text=True)
 ```
 
 
