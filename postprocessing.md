@@ -39,6 +39,17 @@ Plot the free energy surfaes per CV of interest. Note that the CV sequence synta
 ## For TDP-43 WtoA
 !for i in $(echo Rg Rg1 Rg2 Rg3 Rg4 torsion1 torsion2 RMSD1 RMSD2 RMSD3);do python fes2.py --CV_col $num --CV_name $i ; num=$((num+1)) ; echo $num; done
 ```
+<p align="center">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/FESRg.png?raw=true" alt="Alt text" width="50%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/FESRg1.png?raw=true" alt="Alt text" width="50%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/FESRg2.png?raw=true" alt="Alt text" width="50%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/FESRg3.png?raw=true" alt="Alt text" width="50%">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/FESRg4.png?raw=true" alt="Alt text" width="50%">
+
+  <br> a)Rg, b)Rg1, c) Rg2,d) Rg3, e) Rg4
+  <em> </em>
+</p>
+
 
 Calculation of the Root Mean Square Fluctuations (RMSF) per residue.
 
