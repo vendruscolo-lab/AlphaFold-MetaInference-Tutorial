@@ -429,10 +429,6 @@ os.system(f'python {path_gen_analysis}')
 ```
 Similarly the plumed_analysis file is used to calculate the weights using the Torrie valeau weights as done [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). For TDP-43 WtoA, the plumed_analysis.dat can be found [here](https://github.com/vendruscolo-lab/AlphaFold-IDP/blob/main/scripts_prep/plumed_analysis_TDP-43.dat)
 
-
-
-__Note:__ that users needs to fill in the respective PLUMED (_ _FILL _ _) PBMETAD and Metainference parameters according to the problem in need.
-
 __Note:__ This tutorial assumes that you know [Parallel Bias Metadynamics](https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html) and [Metainference](https://link.springer.com/content/pdf/10.1007/978-1-4939-9608-7_13.pdf) theory and practice.
 
 
@@ -447,7 +443,7 @@ shutil.copy2(dir+"/../scripts_prep/plumed_analysis_TDP-43.dat", dir+'/plumed_ana
 
 ```
 
-## Energy minimization
+## Energy minimization using OPENMM and CALVADOS2
 ```python
 #Activate the conda openmm-plumed environment
 shutil.copy2(dir+"/../scripts_prep/simulate_em.py", dir)
