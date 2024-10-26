@@ -48,7 +48,15 @@ os.chdir(os.getcwd()+'/../install/lib')
 
 __For this example (TDP-43 WtoA):__
 
-The AF distance map has already been calculated and it is loaded below.
+The AF distance map has already been calculated and it is loaded below. We here show the AF prediction for the a) Inter-residue distances, b)PLDDT score and c)PAE per residue pair. 
+
+<p align="center">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/alphafold2_ptm_model_3_seed_000_distmat.png?raw=true" alt="Alt text" width="80%">
+  <br>
+  <em> </em>
+</p>
+
+
 
 __For arbitrary protein sequences:__
 
