@@ -100,4 +100,4 @@ from google.colab import files
 files.download(home+"/archive.zip")
 
 ```
-
+##### [Back to AlphaFold-Metainference home](NAVIGATION.md)
