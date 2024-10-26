@@ -65,7 +65,13 @@ plt.savefig('rmsf.pdf',bbox_inches='tight')
     
 ![png](images/AF-IDP_colab_29_1.png)
     
-Finally,to showcase the advantage of AF-MI, we show how AF-MI compares to SAXS data and plain CALVADOS2 as for the pair-distance distribution function [Ref](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full)
+Finally,to showcase the advantage of AF-MI, we show pair-distance distribution function (PDDF) from SAXS data, based on a single AF PDB structure and AF-MI structural ensemble[Ref](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full).
+
+<p align="center">
+  <img src="https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/images/PDDF_tdp43WtoA.jpg?raw=true" alt="Alt text" width="80%">
+  <br>
+  <em> </em>
+</p>
 
 
 Download files
