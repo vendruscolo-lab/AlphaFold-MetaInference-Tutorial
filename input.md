@@ -122,8 +122,7 @@ os.system(f'python {path_gen_xml}')
 
 
 ```
-Run AF-MI
-
+Make the AF-MI PLUMED ``` plumed.dat``` input file 
 ```python
 #Make plumed files.
 #Copy and run the prep script that makes the plumed file.
@@ -132,11 +131,14 @@ import subprocess
 shutil.copy2(dir+"/../scripts_prep/make_plumed_distmat.py", dir)
 subprocess.run(['python', str(dir)+'/make_plumed_distmat.py', 'sequence.dat',str(PAE_cut), '0.2'], capture_output=True, text=True)
 ```
+The plumed.dat file can be seen below. The ```distance_rest_domains``` are the af-distances do be restrained. For TDP-43 WtoA, the three ordered domains are RMSD restrained with RMSD1,RMSD2,RMSD3. 
+Note the __FILL__ entries the user should specify for the specific system at hand. This includes the CV definition, biasfactor, sigma, number of bins in the grid for saving the FES along the PB MetaD simulation. For more info on PB-MetaD can be found [here](https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html). A usual rule of thumb for the ```biasfactor``` value is ```10*sqrt(number of biased CVs)```. 
+For TDP-43 WtoA, the ```plumed.dat``` file can be found [here](https://github.com/vendruscolo-lab/AlphaFold-IDP/blob/main/scripts_prep/plumed_TDP-43.dat)
 
 
-```python
-!cat plumed.dat
-```
+
+
+```plumed
 
     MOLINFO MOLTYPE=protein STRUCTURE=input_af.pdb
     WHOLEMOLECULES ENTITY0=1-414
@@ -414,8 +416,9 @@ subprocess.run(['python', str(dir)+'/make_plumed_distmat.py', 'sequence.dat',str
     PRINT FILE=ENERGY ARG=pb.bias STRIDE=200
     PRINT ARG=af_mi_rest_domains.*   STRIDE=200 FILE=BAYES_rest_domains
     ENDPLUMED
+```
 
-
+Make the PLUMED analysis file ```python plumed_analysis.dat```
 
 ```python
 #Make the plumed_analysis.dat file
@@ -424,6 +427,7 @@ path_gen_analysis = dir+'/make_plumed_analysis.py sequence.dat'
 os.system(f'python {path_gen_analysis}')
 
 ```
+Similarly the plumed_analysis file is used to calculate the weights using the Torrie valeau weights as done [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). For TDP-43 WtoA, the plumed_analysis.dat can be found [here](https://github.com/vendruscolo-lab/AlphaFold-IDP/blob/main/scripts_prep/plumed_analysis_TDP-43.dat)
 
 
 
