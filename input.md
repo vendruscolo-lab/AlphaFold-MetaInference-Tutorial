@@ -1,422 +1,464 @@
-# Input files preparation
+# Software installation
 
-In the zip file available in the [GitHub repository](https://github.com/compsb-unimi/VMetaD-tutorial) you will find all the initial files needed to run this tutorial.
 
-## Preliminary molecular dynamics run
-As a first step for the VMetaD run, we have to choose the atoms which will constitute the reference frame on which we will calculate the position of the ligand with respect to the protein. To be sure in choosing residues that remain stable (i.e. do not belong to a moving loop), we run a 100 ns-long plain molecular dynamics (MD) simulation at 300 K (that is the temperature at which we will run and analyze all the simulations in this tutorial). This run took 2 h on 4 CPUs of a M1 Max MacBook Pro).
 
-After the simulation, we calculate the per-residue root mean square fluctuations (RMSF), which highlights the more dynamic residues.
+The code below needs to run in colab
 
-<p align="center">
-  <img src="https://github.com/riccardocapelli/VMetaD-tutorial/blob/main/img/rmsf.jpg?raw=true" alt="Alt text" width="50%">
-  <br>
-  <em>Per-residue root mean square fluctuation (RMSF) computed from a plain MD simulation of lysozyme-benzene complex. The portion of the plot with light blue background represents the C-terminal domain, where the benzene binds.</em>
-</p>
 
-We can see that almost all the C-terminal domain (residues 71-162) does not show large fluctuations, and only few residues are above the (arbitrary) RMSF threshold of 0.15 nm. We thus consider to define the reference frame considering all the residues 71-162 but the five ones with RMSF > 0.15 nm (residues 135, 136, 137, 140, and 141).
-
-## PDB file for reference frame refitting
-To be sure to keep the structure stable during the simulation, we will define the reference frame of VMetaD on the residues selected for the fit. To have a reference structure to be used in PLUMED (see the next section for the input file), we convert the initial structure to the PDB format using `gmx editconf` (to ensure consistency with the numbering) and keeping only the C-alphas:
-```
-gmx editconf -f starting.gro -o ref_ca.pdb
-grep "CA" ref_ca.pdb > tmpfile && mv tmpfile ref_ca.pdb
-```
-Remember to add the correct values to the b-factor columns (and/or removing unwanted atoms for the fitting procedure) telling PLUMED which are the atoms we want to use for the fitting procedure (see the `ref_ca.pdb` file in the folder for reference).
-
-## Choice of the restraining potential size
-
-We now need to choose the size of the restraint potential. In the [original paper](https://doi.org/10.1021/acs.jpclett.9b01183) we showed that the reliability of the estimates is not affected by the size of the potential. However, we have to keep in mind that we need a part of the box where the ligand can stay far away from the protein in order to represent the unbound state in a satisfactory way. An important point here is that the sphere constraint __must__ be inside the box, otherwise the entropic correction will not accurately account for the loss of configurational space. To visually inspect how large the potential is, and to get a feel for the possible movements of the ligand, we can visualize both the system and the restraint with VMD (downloadable [here](https://www.ks.uiuc.edu/Research/vmd/)).
-
-We can open VMD and load the `starting.gro` structure file in the GitHub folder. After the structure is loaded and the visualization has been set up at your taste, you can open the Tk console and write
-```
-pbc box
-```
-which draws the cubic box in which the system is inserted. 
-
-Now we can generate the atom selection we defined after checking the RMSF:
-```
-set sel [atomselect top "resid 71 to 134 or resid 138 to 139 or resid 142 to 162"]
-```
-The console should answer
-```
-atomselectXX
-```
-Where `XX` is a number. The selection for the reference frame has been defined and named `$sel`. Now we can compute the position of the center of mass of this set of atoms:
-```
-measure center $sel weight mass
-```
-The console should answer with the position of the center of mass (in Ångstrom)
-```
-35.28876876831055 34.06196594238281 32.041622161865234
-```
-Knowing this information, we can draw the sphere with a radius of (for example) 2 nm  (20 Å) with the following command
-```
-draw sphere {35.28876876831055 34.06196594238281 32.041622161865234} radius 20 resolution 100
-```
-Receiving a number as an answer from the console. Such number is the ID of the 3D object we just draw. The drawn sphere is opaque, not allowing us to see inside it; to make it transparent, we need to specify that we want a transparent material
-```
-draw material Transparent
-```
-We can see that the sphere contains the entire domain, but it is probably too small to represent the unbound state in a precise way. Let's delete the sphere using the ID of the 3D object (let's say that it is `14`), and plot a new sphere of radius 2.8 nm
-```
-draw delete 14
-draw sphere {35.28876876831055 34.06196594238281 32.041622161865234} radius 28 resolution 100
+```python
+#Install collab
+!pip install -q condacolab
+import condacolab
+condacolab.install()
 ```
 
-You can see the expected result below
-<p align="center">
-  <img src="https://github.com/riccardocapelli/VMetaD-tutorial/blob/main/img/sphere_box.jpg?raw=true" alt="Alt text" width="50%">
-  <br>
-  <em>Cartoon representation of the lysozyme-benzene complex, including the restraining potential applied within a 2.8 nm radius of the reference frame center of mass. The boundaries of the simulation box are also highlighted to show that the sphere is entirely contained by the box. </em>
-</p>
+```python
+import os
+home=os.getcwd()
+os.chdir(home)
 
-## The PLUMED input file
-_(You can read the following line-by-line description keeping an eye on the `plumed.dat` file in the GitHub folder as a reference)_
+#Download OpenMM-Plumed-MPI patch
+!conda install -y -c conda-forge mpich mpi4py openmm=8.0 plumed=2.8.2=mpi_mpich_h7ded119_0 py-plumed cmake swig pandas mdtraj biopython matplotlib gromacs
+!conda install -y -c anaconda ipykernel
+!conda install -y -c bioconda pulchra
 
-### Reference frame setup
-We start with the `WHOLEMOLECULES` instruction, to be sure that lysozyme (`ENTITY0`) will not be broken by the periodic boundary condition, as well as the benzene molecule (`ENTITY1`):
-```plumed
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-```
-Now that we are sure of the integrity of the structures in PLUMED, we perform the rototranslational fit of the system to make sure that the protein will be in the fixed reference frame position:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-#ENDHIDDEN
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-```
+!git clone https://github.com/vendruscolo-lab/OpenMM-Plumed-MPI
 
-We then start with the groups definition. We previously prepared a GROMACS index file (`index.ndx`) with all the groups named as intended. As an alternative, you can also define such groups with atom ids.
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
+os.chdir(home+'/OpenMM-Plumed-MPI')
 
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-#ENDHIDDEN
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-```
-We have three groups: 
-* `prot_noh`, which contains all the non-hydrogen atoms of the protein (for our multi-eGO potential is equivalent to all the protein, but in all-atom representation it makes a difference);
-* `sph`, which contains the atoms that define the reference frame (the C-alpha of the selected residues -see above-);
-* `lig`, which contains the atoms of the ligand.
-
-After the definition of the groups, to avoid that the passage in a periodic boundary conditions causes a "jump" of the ligand with respect to the protein, we add a `WRAPAROUND` instruction:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-#ENDHIDDEN
-WRAPAROUND ATOMS=lig AROUND=sph
-```
-Ending the fitting part of the PLUMED input.
-
-### Spherical coordinates definition
-We now compute the position of the center of mass of the atoms defining the reference frame ($(x,y,z)=(0,0,0)$ in our CV space), and the center of mass of the ligand:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-#ENDHIDDEN
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-```
-From the position, we can obtain the cartesian coordinates of the ligand in this reference frame
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-#ENDHIDDEN
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-```
-and via the usual transformation, obtain the final spherical coordinates $(\rho,\theta,\varphi)$
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-#ENDHIDDEN
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-```
-which will be our CVs.
-
-### Restraining
-We now have to impose the spherical restraint. We put a `UPPER_WALLS` which impedes the ligand to go farther than 2.8 nm:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-#ENDHIDDEN
-restr: UPPER_WALLS ARG=rho AT=2.8 KAPPA=10000
-```
-the $k$ value is 10,000 kJ/mol/nm^2, which means that if the ligand is out by 0.1 nm he will feel a potential of 100 kJ/mol.
-
-One effect that we should take into account is the possibility that the ligand, in advanced phases of the simulation, will try to unfold the protein, being the place occupied by it the volume portion with less history-dependent potential deposited. To limit this phenomenon we will put in place a RMSD restraining that will be removed during the reweighting procedure. To compute the RMSD we will use the same atoms included in the `ref_ca.pdb` file instruction
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
-
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-
-restr: UPPER_WALLS ARG=rho AT=2.8 KAPPA=10000
-#ENDHIDDEN
-rmsd: RMSD REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-restr_rmsd: RESTRAINT ARG=rmsd AT=0. KAPPA=250.0
+#Build openmm-plumed-mpi
+!mkdir build install openmm -p plumed/include -p plumed/lib
+!unzip openmm.zip -d openmm
+!unzip plumed_lib.zip -d plumed/lib
+!unzip plumed_include.zip -d plumed/include
+os.chdir(os.getcwd()+'/build')
+!cmake ..
+!make
+!make install
+!make PythonInstall
+os.chdir(os.getcwd()+'/../install/lib')
+!cp -r * /usr/local/lib/
 ```
 
-### Reweighting CVs
-As anticipated in the theory part, to compute binding free energy differences we will need to reweight our free energy landscape on new apt CVs which will allow us in discriminating efficiently the bound and unbound states. Like in the original work, here we will use again the distance from the origin of the reference frame $\rho$ and the number of contacts between the protein and the ligand. This will guarantee that if the guest can be considered not in contact with the host (and thus defining the unbound state), even if $\rho$ is large.
+# Run Alpha-Fold distance map prediction
 
-The total number of contact $c$ is defined with a switching function
 
-$$
-c = \sum_{i,j} \frac{ 1 - \left(\frac{r_{ij}}{r_0}\right)^{6} } 
-{1 - \left(\frac{r_{ij}}{r_0}\right)^{12} }
-$$
+__For this example (TDP-43 WtoA):__
 
-which runs on all the (heavy) atoms of the protein and all the atoms of the ligand. This is implemented with `COOORDINATION`:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
+The AF distance map has already been calculated and it is loaded in this notebook below.
 
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
+__For arbitrary protein sequences:__
 
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
+*   Open [this](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb) link and chose colab.
+*   Input the protein sequence  as query sequence.
+*   The rest of the options remain default and cells are run until the end.
+*   Download the link with the AF data and upload it as AF_data in AlphaFold-IDP folder
 
-WRAPAROUND ATOMS=lig AROUND=sph
+# Setup protein system in CALVADOS and OPENMM
 
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
 
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-
-restr: UPPER_WALLS ARG=rho AT=2.8 KAPPA=10000
-
-rmsd: RMSD REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-restr_rmsd: RESTRAINT ARG=rmsd AT=0. KAPPA=250.0
-#ENDHIDDEN
-c: COORDINATION GROUPA=lig GROUPB=prot_noh R_0=0.45
+```python
+os.chdir(home)
+!git clone https://github.com/vendruscolo-lab/AlphaFold-IDP
 ```
-where we set a $r_0$ parameter at 0.45 nm.
 
-### Volume-based Metadynamics
-We now set up the VMetaD:
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
+```python
+os.chdir(home+'/AlphaFold-IDP/prep_run')
 
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
-
-WRAPAROUND ATOMS=lig AROUND=sph
-
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
-
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
-
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
-
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-
-restr: UPPER_WALLS ARG=rho AT=2.8 KAPPA=10000
-
-rmsd: RMSD REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-restr_rmsd: RESTRAINT ARG=rmsd AT=0. KAPPA=250.0
-
-c: COORDINATION GROUPA=lig GROUPB=prot_noh R_0=0.45
-#ENDHIDDEN
-METAD ...
-  ARG=rho,theta,phi
-  GRID_MIN=0,0.,-pi
-  GRID_MAX=3.5,pi,pi
-  SIGMA=0.1,pi/16.,pi/8
-  HEIGHT=0.5
-  PACE=2000
-  BIASFACTOR=10
-  TEMP=300
-  LABEL=metad
-  CALC_RCT
-... METAD
 ```
-The most exotic option used is `CALC_RCT`, which allows the calculation on the fly of the [Tiwary-Parrinello estimator](https://doi.org/10.1021/jp504920s) that we will use for reweighting.
 
-### Printing
-We finally print all the relevant files that we will use for post-processing and analysis. 
-```plumed
-#HIDDEN
-WHOLEMOLECULES ENTITY0=1-1284 ENTITY1=1285-1290
 
-FIT_TO_TEMPLATE REFERENCE=ref_ca.pdb TYPE=OPTIMAL
+```python
+import shutil
+import csv
+dir=os.getcwd()
+###################### The entries below need to be adapted in eac simulation ######################
+#TDP-43 sequence
+fasta_sequence="MSEYIRVTEDENDEPIEIPSEDDGTVLLSTVTAQFPGACGLRYRNPVSQCMRGVRLVEGILHAPDAGAGNLVYVVNYPKDNKRKMDETDASSAVKVKRAVQKTSDLIVLGLPAKTTEQDLKEYFSTFGEVLMVQVKKDLKTGHSKGFGFVRFTEYETQVKVMSQRHMIDGRACDCKLPNSKQSQDEPLRSRKVFVGRCTEDMTEDELREFFSQYGDVMDVFIPKPFRAFAFVTFADDQIAQSLCGEDLIIKGISVHISNAEPKHNSNRQLERSGRFGGNPGGFGNQGGFGNSRGGGAGLGNNQGSNMGGGMNFGAFSINPAMMAAAQAALQSSAGMMGMLASQQNQSGPSGNNQNQGNMQREPNQAFGSGNNSYSGSNSGAAIGAGSASNAGSGSGFNGGFGSSMDSKSSGAGM"
+#Conditions
+pH=7.4
+temp=298
+ionic=0.2
+PAE_cut=5
+Pr_cut=0.2
+NR=2
+#Decide the plddt based ordered (od) and disordered (dd) regions
+ordered_domains = {'od1': [3, 79], 'od2': [104,178],'od3':[191,260]}
+disordered_domains={'dd1': [1,2],'dd2':[80,103],'dd3':[179,190],'dd4':[261,414]}
 
-prot_noh: GROUP NDX_FILE=index.ndx NDX_GROUP=Protein-H
-sph: GROUP NDX_FILE=index.ndx NDX_GROUP=sphere
-lig: GROUP NDX_FILE=index.ndx NDX_GROUP=ligand
+#AF input created in AF-distance map prediction and used in AF-MI
+pdb_af='tdp43_WtoA_bf4cc_unrelaxed_rank_001_alphafold2_ptm_model_3_seed_000.pdb'
+json_af='tdp43_WtoA_bf4cc_predicted_aligned_error_v1.json'
+npy_af='alphafold2_ptm_model_3_seed_000_prob_distributions.npy'
+mean_af='alphafold2_ptm_model_3_seed_000_mean.csv'
+#Copy AF data
+shutil.copy2(dir+"/../AF_DATA/"+pdb_af, dir+"/pdb_af.pdb")
+shutil.copy2(dir+"/../AF_DATA/"+json_af, dir+"/pae.json")
+shutil.copy2(dir+"/../AF_DATA/tdp43_WtoA_bf4cc_distmat/"+mean_af, dir+"/mean_af.csv")
+shutil.copy2(dir+"/../AF_DATA/tdp43_WtoA_bf4cc_distmat/"+npy_af, dir+"/prob.npy")
+####################################################################################################
 
-WRAPAROUND ATOMS=lig AROUND=sph
+f = open("sequence.dat", "w")
+f.write(fasta_sequence)
+f.close()
+#Write the csv files
+with open('ordered_domains.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
+    w = csv.DictWriter(f, ordered_domains.keys())
+    w.writeheader()
+    w.writerow(ordered_domains)
+with open('disordered_domains.csv', 'w') as f:  # You will need 'wb' mode in Python 2.x
+    w = csv.DictWriter(f, disordered_domains.keys())
+    w.writeheader()
+    w.writerow(disordered_domains)
 
-sph_center: COM ATOMS=sph
-lig_center: COM ATOMS=lig
+#Copy OPENMM calvados forcefield files
+shutil.copy2(dir+"/../scripts_prep/gen_xml_and_constraints.py", dir)
+shutil.copy2(dir+"/../scripts_prep/residues.csv", dir)
 
-sph_coord: POSITION ATOM=sph_center NOPBC
-lig_coord: POSITION ATOM=lig_center NOPBC
+path_gen_xml = dir+'/gen_xml_and_constraints.py sequence.dat '+str(pH)+' '+str(temp)+' '+str(ionic)
+print(path_gen_xml)
+os.system(f'python {path_gen_xml}')
 
-abs_x: MATHEVAL ARG=lig_coord.x,sph_coord.x FUNC=x-y PERIODIC=NO
-abs_y: MATHEVAL ARG=lig_coord.y,sph_coord.y FUNC=x-y PERIODIC=NO
-abs_z: MATHEVAL ARG=lig_coord.z,sph_coord.z FUNC=x-y PERIODIC=NO
 
-rho: MATHEVAL ARG=abs_x,abs_y,abs_z FUNC=sqrt(x*x+y*y+z*z) PERIODIC=NO
-theta: MATHEVAL ARG=abs_z,rho FUNC=acos(x/y) PERIODIC=0.,pi
-phi: MATHEVAL ARG=abs_x,abs_y FUNC=atan2(y,x) PERIODIC=-pi,pi
-
-restr: UPPER_WALLS ARG=rho AT=2.8 KAPPA=10000
-
-rmsd: RMSD REFERENCE=ref_ca.pdb TYPE=OPTIMAL
-restr_rmsd: RESTRAINT ARG=rmsd AT=0. KAPPA=250.0
-
-c: COORDINATION GROUPA=lig GROUPB=prot_noh R_0=0.45
-
-METAD ...
-  ARG=rho,theta,phi
-  GRID_MIN=0,0.,-pi
-  GRID_MAX=3.5,pi,pi
-  SIGMA=0.1,pi/16.,pi/8
-  HEIGHT=0.5
-  PACE=2000
-  BIASFACTOR=10
-  TEMP=300
-  LABEL=metad
-  CALC_RCT
-... METAD
-#ENDHIDDEN
-PRINT ARG=metad.* FILE=metad_data.dat STRIDE=200
-PRINT ARG=rmsd,restr_rmsd.bias FILE=rmsd_restraint.dat STRIDE=200
-PRINT ARG=restr.bias FILE=sphere_restraint.dat STRIDE=200
-PRINT ARG=abs_x,abs_y,abs_z FILE=xyz_coord.dat STRIDE=200
-PRINT ARG=rho,theta,phi FILE=rtp_coord.dat STRIDE=200
-PRINT ARG=c,rho FILE=coord_rho.dat STRIDE=200
-
-FLUSH STRIDE=200
 ```
-We will have all the VMetaD quantities in `metad_data.dat`, the restraints data in `{rmsd,sphere}_restaint.dat`, the $(x,y,z)$ and $(\rho,\theta,\varphi)$ coordinates in `xyz_coord.dat` and `rtp_coord.dat`, respectively, and the reweighting CVs in `coord_rho.dat`.
+```python
+#Make plumed files.
+#Copy and run the prep script that makes the plumed file.
+#The Collective variables (CVs) in these case are chosen to be the torsion angles between structured domains.
+import subprocess
+shutil.copy2(dir+"/../scripts_prep/make_plumed_distmat.py", dir)
+subprocess.run(['python', str(dir)+'/make_plumed_distmat.py', 'sequence.dat',str(PAE_cut), str(Pr_cut)], capture_output=True, text=True)
+```
 
-___PLEASE NOTE___: all the printing frequencies are synchronized with the VMetaD `PACE` (every 10 print we deposit 1 gaussian), and it should be synchronized also with trajectory printing (I personally suggest the same frequency used for gaussian deposition). This allows us to restart safely in case of issues and re-run or re-analyze with new CVs the run, if needed.
 
-### Last advices before launching the simulation
-One issue that can be observed when launching when running VMetaD is the sudden interruption of the simulation with a cryptic error. Please check the position of the ligand: in most cases, the system reached $(\rho,\theta,\varphi)=(0,0,0)$, where the derivatives of the potential cannot be defined, and thus PLUMED sends an error. Despite being annoying, this is perfectly normal, and does not invalidate the run. Please restart it from the previous checkpoint (save a checkpoint often!).
+```python
+!cat plumed.dat
+```
 
-Another consideration regarding the singularity of the reference frame is its position with respect to the actual binding site. In close proximity of it (let's say less than 2 sigmas in $\rho$) even an extremely small movement in any direction makes the ligand move of several sigmas in $\theta$ and $\varphi$, with the possibility of underestimation of the bias. This could imply the need of longer simulation times to fill up the basin. To limit this effect, we suggest to verify if the origin of the reference frame is farther that 2-3 sigmas in $\rho$ from the binding site (the perfect situation would be setting the origin in a point occupied by the host, at 4-5 Å from the binding site).
+    MOLINFO MOLTYPE=protein STRUCTURE=input_af.pdb
+    WHOLEMOLECULES ENTITY0=1-414
+    
+    distance_rest_domains:  CONTACTMAP ...
+    ATOMS1=1,4
+    ATOMS2=2,5
+    ATOMS3=2,20
+    ATOMS4=28,79
+    ATOMS5=31,79
+    ATOMS6=35,79
+    ATOMS7=37,79
+    ATOMS8=38,79
+    ATOMS9=39,79
+    ATOMS10=40,79
+    ATOMS11=41,79
+    ATOMS12=42,79
+    ATOMS13=74,79
+    ATOMS14=75,79
+    ATOMS15=76,79
+    ATOMS16=102,105
+    ATOMS17=102,106
+    ATOMS18=102,150
+    ATOMS19=102,151
+    ATOMS20=102,152
+    ATOMS21=102,155
+    ATOMS22=102,158
+    ATOMS23=102,159
+    ATOMS24=102,161
+    ATOMS25=103,106
+    ATOMS26=103,107
+    ATOMS27=103,108
+    ATOMS28=103,120
+    ATOMS29=103,121
+    ATOMS30=103,124
+    ATOMS31=103,130
+    ATOMS32=103,131
+    ATOMS33=103,132
+    ATOMS34=103,133
+    ATOMS35=103,134
+    ATOMS36=103,135
+    ATOMS37=103,147
+    ATOMS38=103,148
+    ATOMS39=103,149
+    ATOMS40=103,150
+    ATOMS41=103,151
+    ATOMS42=103,152
+    ATOMS43=103,153
+    ATOMS44=103,154
+    ATOMS45=103,155
+    ATOMS46=103,156
+    ATOMS47=103,157
+    ATOMS48=103,158
+    ATOMS49=103,159
+    ATOMS50=103,160
+    ATOMS51=103,161
+    ATOMS52=103,162
+    ATOMS53=103,175
+    ATOMS54=103,176
+    ATOMS55=103,177
+    ATOMS56=103,178
+    ATOMS57=104,178
+    ATOMS58=105,178
+    ATOMS59=105,179
+    ATOMS60=106,178
+    ATOMS61=106,179
+    ATOMS62=107,178
+    ATOMS63=107,179
+    ATOMS64=108,178
+    ATOMS65=108,179
+    ATOMS66=109,178
+    ATOMS67=109,179
+    ATOMS68=110,178
+    ATOMS69=111,178
+    ATOMS70=120,178
+    ATOMS71=124,178
+    ATOMS72=131,178
+    ATOMS73=132,178
+    ATOMS74=133,178
+    ATOMS75=134,178
+    ATOMS76=135,178
+    ATOMS77=136,178
+    ATOMS78=137,178
+    ATOMS79=145,178
+    ATOMS80=146,178
+    ATOMS81=147,178
+    ATOMS82=147,179
+    ATOMS83=148,178
+    ATOMS84=148,179
+    ATOMS85=149,178
+    ATOMS86=149,179
+    ATOMS87=150,178
+    ATOMS88=150,179
+    ATOMS89=151,178
+    ATOMS90=151,179
+    ATOMS91=152,178
+    ATOMS92=155,178
+    ATOMS93=158,178
+    ATOMS94=159,178
+    ATOMS95=159,179
+    ATOMS96=161,178
+    ATOMS97=161,179
+    ATOMS98=162,178
+    ATOMS99=162,179
+    ATOMS100=163,178
+    ATOMS101=164,178
+    ATOMS102=165,178
+    ATOMS103=166,178
+    ATOMS104=173,178
+    ATOMS105=174,178
+    ATOMS106=174,179
+    ATOMS107=175,178
+    ATOMS108=175,179
+    ATOMS109=176,179
+    ATOMS110=189,192
+    ATOMS111=189,233
+    ATOMS112=189,240
+    ATOMS113=190,193
+    ATOMS114=190,194
+    ATOMS115=190,195
+    ATOMS116=190,209
+    ATOMS117=190,210
+    ATOMS118=190,211
+    ATOMS119=190,212
+    ATOMS120=190,213
+    ATOMS121=190,214
+    ATOMS122=190,216
+    ATOMS123=190,217
+    ATOMS124=190,218
+    ATOMS125=190,219
+    ATOMS126=190,220
+    ATOMS127=190,230
+    ATOMS128=190,231
+    ATOMS129=190,232
+    ATOMS130=190,233
+    ATOMS131=190,234
+    ATOMS132=190,235
+    ATOMS133=190,236
+    ATOMS134=190,237
+    ATOMS135=190,238
+    ATOMS136=190,239
+    ATOMS137=190,240
+    ATOMS138=190,241
+    ATOMS139=190,242
+    ATOMS140=190,243
+    ATOMS141=190,244
+    ATOMS142=190,257
+    ATOMS143=190,258
+    ATOMS144=191,260
+    ATOMS145=192,260
+    ATOMS146=192,261
+    ATOMS147=193,260
+    ATOMS148=193,261
+    ATOMS149=193,262
+    ATOMS150=194,260
+    ATOMS151=194,261
+    ATOMS152=194,262
+    ATOMS153=195,260
+    ATOMS154=195,261
+    ATOMS155=196,260
+    ATOMS156=197,260
+    ATOMS157=211,260
+    ATOMS158=219,260
+    ATOMS159=221,260
+    ATOMS160=222,260
+    ATOMS161=223,260
+    ATOMS162=229,260
+    ATOMS163=229,261
+    ATOMS164=230,260
+    ATOMS165=230,261
+    ATOMS166=231,260
+    ATOMS167=231,261
+    ATOMS168=232,260
+    ATOMS169=232,261
+    ATOMS170=233,260
+    ATOMS171=234,260
+    ATOMS172=234,261
+    ATOMS173=236,260
+    ATOMS174=237,260
+    ATOMS175=238,260
+    ATOMS176=239,260
+    ATOMS177=240,260
+    ATOMS178=241,260
+    ATOMS179=241,261
+    ATOMS180=242,260
+    ATOMS181=243,260
+    ATOMS182=243,261
+    ATOMS183=244,260
+    ATOMS184=245,260
+    ATOMS185=246,260
+    ATOMS186=247,260
+    ATOMS187=248,260
+    ATOMS188=255,260
+    ATOMS189=256,260
+    ATOMS190=256,261
+    ATOMS191=257,260
+    ATOMS192=257,261
+    ATOMS193=258,261
+    ATOMS194=258,262
+    ATOMS195=259,262
+    ATOMS196=298,301
+    ATOMS197=300,303
+    ATOMS198=304,307
+    ATOMS199=318,321
+    ATOMS200=321,324
+    ATOMS201=321,325
+    ATOMS202=321,326
+    ATOMS203=322,325
+    ATOMS204=322,326
+    ATOMS205=323,326
+    ATOMS206=323,327
+    ATOMS207=324,327
+    ATOMS208=325,328
+    ATOMS209=326,329
+    ATOMS210=348,351
+    ATOMS211=350,353
+    ATOMS212=351,354
+    ATOMS213=352,355
+    ATOMS214=357,360
+    ATOMS215=360,363
+    ATOMS216=371,374
+    ATOMS217=376,379
+    ATOMS218=386,389
+    ATOMS219=392,395
+    ATOMS220=394,397
+    ATOMS221=396,399
+    ATOMS222=399,402
+    ATOMS223=400,403
+    ATOMS224=402,405
+    ATOMS225=402,406
+    ATOMS226=407,411
+    ATOMS227=408,411
+    SWITCH={CUSTOM FUNC=x R_0=1}
+    ...
+    
+    af_dist_rest: CONSTANT VALUES=1.0032847926020623,1.0311901761218905,0.7455537494271994,1.7088723132386805,1.713635583035648,1.5095473634079102,1.1722138326615095,1.2549746362492442,0.9444370301440359,1.2123430594801905,1.5226123476400972,1.3369803665205837,1.4350552991032601,1.271596952714026,0.8981292195618154,1.084396699629724,1.2897209025919436,1.5121250515803697,1.0559752460569143,1.0836912801489234,0.707867799885571,0.9799594385549426,1.2259459158405663,1.5500808618962765,0.9052655544131994,1.3762398231774569,1.5152623694390062,1.68192987870425,1.6158358810469509,1.3273277390748264,1.1055688032880424,0.7953455133363603,1.0522321155294776,1.3843332368880512,1.5040866650640965,1.9200282409787175,1.9061048422008757,1.6269824001938105,1.2354281768202782,1.0676583984866739,0.6573523612692953,0.6149551127105952,0.7450687747448683,0.7618590366095304,0.5613296514376999,1.0004315715283156,0.8841317959129811,0.5908093221485615,0.9980626434087752,1.263882938399911,1.1281702172011137,1.1415027465671301,1.3193011650815607,1.4435925820842384,1.1070262966677549,1.31037020906806,0.8523610839620233,0.6740215603262186,1.1396584818139672,0.7467208079993726,1.1898928672075273,0.4552792670205237,0.8395836766809226,1.017876618169248,1.3974865483120085,1.0051763331517576,1.1795675404369834,1.4049736192449929,1.459107712842524,1.5650913815945389,1.59471937045455,1.5574198851361871,1.3527641544118525,1.4486837401986123,1.1706370314583183,1.4376086220145226,1.1653784492984414,1.7256552413105966,1.4055226838216186,1.427379228360951,0.9732663879171014,1.2228183863684539,0.9791120953857901,1.3816555082798005,0.7472525445744396,1.2260105818510056,1.0942220810800791,1.5762166528031232,1.1099413389340045,1.5934589028358461,1.434581000171602,1.630307266302407,1.2566113555803897,1.5485478518530726,1.81100521478802,1.3977122131735087,1.7663343697786331,1.162875016592443,1.430508084408939,1.6525550663471222,1.7831156572327018,1.785999870300293,1.6451806398108602,1.4654783833771945,1.2249537132680417,1.3939366523176433,1.0378110969439147,1.3681153113022448,0.9096965923905374,1.0000388860702516,1.2344506287947297,0.8380141992121936,0.8398237504065037,1.0381346080452205,1.4053251046687365,2.167353528179228,1.9828473469242454,1.528205112926662,1.8880876734852792,2.016520819067955,1.5591710267588497,1.5430319080129267,1.4479076098650694,1.236793963611126,1.3141041703522205,1.5537533987313508,1.5692297449335457,1.121472422592342,1.1581335106864572,0.91726502366364,0.9532682375982404,1.2505696462467313,1.1205617936328052,0.6651569686830044,1.0967526400461791,1.140981236472726,0.6660797173157335,0.8100334141403437,1.2571399945765735,1.1800085892900825,0.9563456442207099,1.2749242424964906,1.1340990519151093,0.9276029605418444,0.5047679111361504,0.9407211143523457,0.6309511506929995,1.074688763730228,1.2769522689282895,0.5026340553537011,0.7528656773269176,1.0695354964584112,0.9779949204996229,1.300148520246148,1.1204699540510774,1.5327852481976152,1.4124552657827738,1.2289950992912055,1.0769147641956807,1.4084996918216348,1.2656738823279738,1.0495817463845016,1.1779037110507489,1.095422700792551,1.3921284958720208,0.6597456347197295,1.0181769583374263,0.9364564327523113,1.3884215405210854,0.9055566122755409,1.1202643141150477,1.596531630679965,1.518569000810385,1.201885962113738,1.5418776268139482,1.3921274995431305,0.8939561096951366,1.1407407995313406,1.4240611214190722,1.4680646168068052,1.164111346192658,1.5423512058332562,0.9587342431768777,1.234714117459953,1.4588959828019143,1.6841880340129138,1.6086150078102948,1.4471713358536364,1.2795427026227117,1.444847053103149,1.002940315194428,1.3102364122867585,0.9022639036178589,1.2806951073929669,0.989768156595528,0.9441032137721775,0.9244450947269796,0.9194099459797145,0.9374097302556038,0.7403792202472688,0.8557088484987617,1.1484702169895173,0.7273479776456953,0.8502402873709798,0.6981262018904091,0.8579837949946523,0.7507739521563054,0.7508660649880767,0.7793322708457708,0.9225482998415828,0.9773600473999976,0.9583356784656645,0.9616499662399293,0.9474486894905567,1.0015693807974457,0.9874830450862646,0.9377102639526129,0.9753739142790437,0.9764441156759859,0.973571441695094,0.950638056918979,0.9416109262034296,0.9724794756621122,0.966675561480224,1.2231912130489944,1.235738294199109,0.9654571769759062 NODERIV
+    
+    af_dist2: CONSTANT VALUES=0 NODERIV
+    Rg: GYRATION TYPE=RADIUS ATOMS=1-414
+    RMSD1: RMSD REFERENCE=struct1.pdb TYPE=OPTIMAL
+    RMSD2: RMSD REFERENCE=struct2.pdb TYPE=OPTIMAL
+    RMSD3: RMSD REFERENCE=struct3.pdb TYPE=OPTIMAL
+    uwall: UPPER_WALLS ARG=RMSD1,RMSD2,RMSD3 AT=0.02,0.02,0.02 KAPPA=100000,100000,100000 EXP=2,2,2 EPS=1,1,1 OFFSET=0,0,0
+    PRINT FILE=DISTANCE_MAP_REST ARG=distance_rest_domains.* STRIDE=200
+    PRINT FILE=COLVAR ARG=__FILL__ STRIDE=200
+    PBMETAD ...
+        LABEL=pb
+        ARG=__FILL__
+        SIGMA=__FILL__ 
+        SIGMA_MIN=__FILL__ 
+        SIGMA_MAX=__FILL__ 
+        ADAPTIVE=DIFF
+        HEIGHT=__FILL__ 
+        PACE=200
+        BIASFACTOR=__FILL__ 
+        GRID_MIN=__FILL__ 
+        GRID_MAX=__FILL__ 
+        GRID_WSTRIDE=__FILL__ 
+        WALKERS_MPI
+        TEMP=__FILL__ 
+    ... PBMETAD
+    METAINFERENCE ...
+        ARG=(distance_rest_domains.*),pb.bias REWEIGHT
+        PARARG=(af_dist_rest.*)
+        SIGMA_MEAN0=1
+        NOISETYPE=MGAUSS  OPTSIGMAMEAN=SEM AVERAGING=200
+        SIGMA0=10.0 SIGMA_MIN=0.0001 SIGMA_MAX=10.0 DSIGMA=0.1
+        MC_STEPS=10
+        MC_CHUNKSIZE=23
+        WRITE_STRIDE=10000
+        TEMP=__FILL__ 
+        LABEL=af_mi_rest_domains
+    ... METAINFERENCE
+    FLUSH STRIDE=200
+    PRINT FILE=ENERGY ARG=pb.bias STRIDE=200
+    PRINT ARG=af_mi_rest_domains.*   STRIDE=200 FILE=BAYES_rest_domains
+    ENDPLUMED
 
-### Launch!
-You can now run the VMetaD tutorial. We advice you to run it for (at least) 500 ns. In this example, we run it for 1 µs.
 
-##### [Back to VMetad home](NAVIGATION.md)
+
+```python
+#Make the plumed_analysis.dat file
+shutil.copy2(dir+"/../scripts_prep/make_plumed_analysis.py", dir)
+path_gen_analysis = dir+'/make_plumed_analysis.py sequence.dat'
+os.system(f'python {path_gen_analysis}')
+
+```
+
+
+
+__Note:__ that users needs to fill in the respective PLUMED (_ _FILL _ _) PBMETAD and Metainference parameters according to the problem in need.
+
+__Note:__ This tutorial assumes that you know [Parallel Bias Metadynamics](https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html) and [Metainference](https://link.springer.com/content/pdf/10.1007/978-1-4939-9608-7_13.pdf) theory and practice.
+
+
+### In case you are running the TDP-43 WtoA example:
+
+You can directly use the PBMetaD and Metainference parameters just as copied below by executing the next shell. Otherwise you need to define your system specific parameters.
+
+
+```python
+shutil.copy2(dir+"/../scripts_prep/plumed_TDP-43.dat", dir+'/plumed.dat')
+shutil.copy2(dir+"/../scripts_prep/plumed_analysis_TDP-43.dat", dir+'/plumed_analysis.dat')
+
+```
+
+# Energy minimization
+```python
+#Activate the conda openmm-plumed environment
+shutil.copy2(dir+"/../scripts_prep/simulate_em.py", dir)
+#First run a short minimization
+simulate_em = dir+'/simulate_em.py '+str(pH)+' '+str(temp)
+os.system(f'python {simulate_em}')
+
+```
+
+# Run AF-MI
+
+```python
+#and run AF-MI
+shutil.copy2(dir+"/../scripts_prep/simulate.py", dir)
+print(dir)
+#simulate= dir+'/simulate.py '+str(pH)+' '+str(temp)
+#os.system(f'mpirun -np 6 python  {simulate}')
+##param1 = "value1" param2 = "value2" !python script.py {param1} {param2}
+
+!mpirun -np {NR} python simulate.py {pH} {temp}
+```
