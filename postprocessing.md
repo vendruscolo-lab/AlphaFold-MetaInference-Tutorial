@@ -29,6 +29,8 @@ sh keepH.sh```
 !ls segment_5_input_af_rebuilt.xtc
 ```
 
+Plot the free energy surfaes per CV of interest. Note that the CV sequence syntax in for in ``` for i in $(echo CV1 CV2 CV3 etc);do``` needs to follow the order these appear in the ```COLVAR``` file.
+
 ```python
 #Time depentent FES
 #For other proteins the entries CV1,CV2,CV3 etc need to follow the COLVAR columns like:
@@ -38,8 +40,7 @@ sh keepH.sh```
 !for i in $(echo Rg Rg1 Rg2 Rg3 Rg4 torsion1 torsion2 RMSD1 RMSD2 RMSD3);do python fes2.py --CV_col $num --CV_name $i ; num=$((num+1)) ; echo $num; done
 ```
 
-Root mean square fluctuations per residue
-
+Calculation of the Root Mean Square Fluctuations (RMSF) per residue.
 
 ```python
 !echo "0" |gmx rmsf -f segment_5_input_af_rebuilt.xtc -s  segment_5_input_af_0_sys.pdb -res -o rmsf.xvg
@@ -64,6 +65,7 @@ plt.savefig('rmsf.pdf',bbox_inches='tight')
     
 ![png](images/AF-IDP_colab_29_1.png)
     
+Finally,to showcase the advantage of AF-MI, we show how AF-MI compares to SAXS data and plain CALVADOS2 as for the pair-distance distribution function [Ref](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full)
 
 
 Download files
