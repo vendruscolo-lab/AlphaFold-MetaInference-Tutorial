@@ -1,6 +1,6 @@
 __Note:__ The following code can be ran in google colab or jupyter notebook. [This](https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/AF-IDP_colab.ipynb) google colab provides with the full AF-MI protocol, i.e software installation, CALVADOS, PLUMED input preparation, running AF-MI, and analysis. Lets break it down and explain each part. 
 
-# Software installation
+## Software installation
 
 
 
@@ -43,12 +43,12 @@ os.chdir(os.getcwd()+'/../install/lib')
 !cp -r * /usr/local/lib/
 ```
 
-# Run Alpha-Fold distance map prediction
+## Run Alpha-Fold distance map prediction
 
 
 __For this example (TDP-43 WtoA):__
 
-The AF distance map has already been calculated and it is loaded in this notebook below.
+The AF distance map has already been calculated and it is loaded below.
 
 __For arbitrary protein sequences:__
 
@@ -57,25 +57,20 @@ __For arbitrary protein sequences:__
 *   The rest of the options remain default and cells are run until the end.
 *   Download the link with the AF data and upload it as AF_data in AlphaFold-IDP folder
 
-# Setup protein system in CALVADOS and OPENMM
-
+## Setup protein system in CALVADOS2 and OPENMM
 
 ```python
 os.chdir(home)
 !git clone https://github.com/vendruscolo-lab/AlphaFold-IDP
-```
-
-```python
 os.chdir(home+'/AlphaFold-IDP/prep_run')
-
 ```
-
+In the following step we need to define ```python fasta_sequence, pH, temp, ionic, PAE_cut, Pr_cut, NR, ordered_domains, disordered_domains```
 
 ```python
 import shutil
 import csv
 dir=os.getcwd()
-###################### The entries below need to be adapted in eac simulation ######################
+###################### The entries below need to be adapted in each simulation ######################
 #TDP-43 sequence
 fasta_sequence="MSEYIRVTEDENDEPIEIPSEDDGTVLLSTVTAQFPGACGLRYRNPVSQCMRGVRLVEGILHAPDAGAGNLVYVVNYPKDNKRKMDETDASSAVKVKRAVQKTSDLIVLGLPAKTTEQDLKEYFSTFGEVLMVQVKKDLKTGHSKGFGFVRFTEYETQVKVMSQRHMIDGRACDCKLPNSKQSQDEPLRSRKVFVGRCTEDMTEDELREFFSQYGDVMDVFIPKPFRAFAFVTFADDQIAQSLCGEDLIIKGISVHISNAEPKHNSNRQLERSGRFGGNPGGFGNQGGFGNSRGGGAGLGNNQGSNMGGGMNFGAFSINPAMMAAAQAALQSSAGMMGMLASQQNQSGPSGNNQNQGNMQREPNQAFGSGNNSYSGSNSGAAIGAGSASNAGSGSGFNGGFGSSMDSKSSGAGM"
 #Conditions
@@ -100,7 +95,11 @@ shutil.copy2(dir+"/../AF_DATA/"+json_af, dir+"/pae.json")
 shutil.copy2(dir+"/../AF_DATA/tdp43_WtoA_bf4cc_distmat/"+mean_af, dir+"/mean_af.csv")
 shutil.copy2(dir+"/../AF_DATA/tdp43_WtoA_bf4cc_distmat/"+npy_af, dir+"/prob.npy")
 ####################################################################################################
+```
 
+In the following step we create the OPENMM CALVADOS2 .xml files
+
+```python 
 f = open("sequence.dat", "w")
 f.write(fasta_sequence)
 f.close()
@@ -443,7 +442,7 @@ shutil.copy2(dir+"/../scripts_prep/plumed_analysis_TDP-43.dat", dir+'/plumed_ana
 
 ```
 
-# Energy minimization
+## Energy minimization
 ```python
 #Activate the conda openmm-plumed environment
 shutil.copy2(dir+"/../scripts_prep/simulate_em.py", dir)
@@ -453,7 +452,7 @@ os.system(f'python {simulate_em}')
 
 ```
 
-# Run AF-MI
+## Run AF-MI
 
 ```python
 #and run AF-MI
