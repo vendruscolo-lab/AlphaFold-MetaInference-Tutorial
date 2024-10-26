@@ -443,25 +443,16 @@ shutil.copy2(dir+"/../scripts_prep/plumed_analysis_TDP-43.dat", dir+'/plumed_ana
 
 ```
 
-## Energy minimization using OPENMM and CALVADOS2
+## Short energy minimization using OPENMM and CALVADOS2
 ```python
-#Activate the conda openmm-plumed environment
 shutil.copy2(dir+"/../scripts_prep/simulate_em.py", dir)
-#First run a short minimization
 simulate_em = dir+'/simulate_em.py '+str(pH)+' '+str(temp)
 os.system(f'python {simulate_em}')
-
 ```
 
 ## Run AF-MI
 
 ```python
-#and run AF-MI
 shutil.copy2(dir+"/../scripts_prep/simulate.py", dir)
-print(dir)
-#simulate= dir+'/simulate.py '+str(pH)+' '+str(temp)
-#os.system(f'mpirun -np 6 python  {simulate}')
-##param1 = "value1" param2 = "value2" !python script.py {param1} {param2}
-
 !mpirun -np {NR} python simulate.py {pH} {temp}
 ```
