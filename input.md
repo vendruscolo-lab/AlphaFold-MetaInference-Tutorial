@@ -466,3 +466,4 @@ os.system(f'python {simulate_em}')
 shutil.copy2(dir+"/../scripts_prep/simulate.py", dir)
 !mpirun -np {NR} python simulate.py {pH} {temp}
 ```
+##### [Back to AlphaFold-Metainference home](NAVIGATION.md)
