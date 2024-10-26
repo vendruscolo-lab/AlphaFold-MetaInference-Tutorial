@@ -48,7 +48,10 @@ os.chdir(os.getcwd()+'/../install/lib')
 
 __For this example (TDP-43 WtoA):__
 
-The AF distance map has already been calculated and it is loaded below.
+The AF distance map has already been calculated and it is loaded below. We here show the AF prediction for the a) Inter-residue distances, b)PLDDT score and c)PAE per residue pair. 
+
+
+
 
 __For arbitrary protein sequences:__
 
