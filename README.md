@@ -19,6 +19,8 @@ ___NB:___ This tutorial assumes that you know metadynamics theory and practice i
 
 #### This tutorial has been contributed by
 Dr. Faidon Brotzakis (fb516@cam.ac.uk, brotzakis@fleming.gr)
+
 Hussein Murtada (mhm42@cam.ac.uk)
+
 Prof. Michele Vendruscolo (mv245@cam.ac.uk)
 
