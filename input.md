@@ -1,8 +1,10 @@
+__Note:__ The following code can be ran in google colab or jupyter notebook. [This](https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/AF-IDP_colab.ipynb) google colab provides with the full AF-MI protocol, i.e software installation, CALVADOS, PLUMED input preparation, running AF-MI, and analysis. Lets break it down and explain each part. 
+
 # Software installation
 
 
 
-The code below needs to run in colab
+The code below needs to run in colab. We first install condacolab which is essential in running conda google colab. This step is not necessary if one runs just in a jupyter-notebook locally. 
 
 
 ```python
@@ -11,6 +13,7 @@ The code below needs to run in colab
 import condacolab
 condacolab.install()
 ```
+The code below installs various necessary packages such as PLUMED, mpi, OPENMM, pandas, gromacs, biopython, pulchra. Moreover it builds the OPENMM-PLUMED-MPI patch which is necessary for running metainference in OPENMM.  
 
 ```python
 import os
