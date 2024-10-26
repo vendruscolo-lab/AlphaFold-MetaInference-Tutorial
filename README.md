@@ -17,4 +17,8 @@ Finally, we will discuss how to generate the unbiased structural ensemble of TDP
 
 ___NB:___ This tutorial assumes that you know metadynamics theory and practice in PLUMED (if not, a good start can be the [PLUMED tutorial](https://www.plumed-tutorials.org/lessons/21/004/data/NAVIGATION.html) about it).
 
+#### This tutorial has been contributed by
+Dr. Faidon Brotzakis (fb516@cam.ac.uk, brotzakis@fleming.gr)
+Hussein Murtada (mhm42@cam.ac.uk)
+Prof. Michele Vendruscolo (mv245@cam.ac.uk)
 
