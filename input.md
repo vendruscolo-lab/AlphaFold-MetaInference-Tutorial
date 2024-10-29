@@ -129,8 +129,6 @@ shutil.copy2(dir+"/../scripts_prep/residues.csv", dir)
 path_gen_xml = dir+'/gen_xml_and_constraints.py sequence.dat '+str(pH)+' '+str(temp)+' '+str(ionic)
 print(path_gen_xml)
 os.system(f'python {path_gen_xml}')
-
-
 ```
 Make the AF-MI PLUMED ``` plumed.dat``` input file 
 ```python
@@ -449,7 +447,6 @@ You can directly use the PBMetaD and Metainference parameters just as copied bel
 ```python
 shutil.copy2(dir+"/../scripts_prep/plumed_TDP-43.dat", dir+'/plumed.dat')
 shutil.copy2(dir+"/../scripts_prep/plumed_analysis_TDP-43.dat", dir+'/plumed_analysis.dat')
-
 ```
 
 ## Short energy minimization using OPENMM and CALVADOS2
