@@ -1,4 +1,4 @@
-__Note:__ The following code can be ran in google colab or jupyter notebook. [This](https://colab.research.google.com/drive/1p7IY6HEbLQyrKaiX3JpWz5m5xggRI3sr) google colab provides with the full AF-MI protocol, i.e software installation, CALVADOS, PLUMED input preparation, running AF-MI, and analysis. Lets break it down and explain each part. 
+__Note:__ The following code can be run in google colab or jupyter notebook. [This](https://colab.research.google.com/github/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/AF-IDP_colab.ipynb) google colab provides with the full AF-MI protocol, i.e software installation, CALVADOS, PLUMED input preparation, running AF-MI, and analysis. Lets break it down and explain each part. 
 
 ## Software installation
 
