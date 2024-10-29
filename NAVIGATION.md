@@ -21,16 +21,21 @@ ___NB:___ This tutorial assumes that you know metadynamics theory and practice i
 
 ```mermaid
 flowchart TB
-  A[PLUMED syntax] -.-> C[Theory];
-  B[Metadynamics Tutorial] -.->  C
-  C --> D[Case study]
-  D --> E[Input files]
-  E --> F[Post-processing]
-  
+  A[PLUMED syntax] -.-> D[Theory];
+  B[Parallel Bias Metadynamics] -.->  D;
+  C[Metainference] -.-> D;
+  D --> E[Case study];
+  E --> F[Jupyter/Colab]
+  F --> G[Inputs]
+  G --> F[Jupyter/Colab]
+  F --> H[Post-processing]
+
   click A "syntax" "This lesson teaches you the basic features of the PLUMED input syntax"
-  click B "metad" "This lesson teaches you how to perform and analyze Metadynamics simulations"
-  click C "theory.md" "AlphaFold-Metainference theory intro & overview"
-  click D "case_study.md" "Case study: TDP-43 monomer dyamics"
-  click E "input.md" "Input files preparation"
-  click F "posprocessing.md" "Structural ensemble generation and post-processing analysis"
+  click B "PBMetaD" "This lesson teaches you how to perform and analyze Metadynamics simulations"
+  click C "Metainference" "This lesson teaches you how to perform and analyze Metadynamics simulations"
+  click D "theory.md" "AlphaFold-Metainference theory intro & overview"
+  click E "case_study.md" "Case study: TDP-43 monomer dyamics"
+  click F "AF-MIcolab" "AF-MI colab performing software installation, system preparation, AF-MI simulation and post-processing analysis"
+  click G "input.md" "Input: Protein sequence,  AF-MI simulation data and parameters"
+  click H "posprocessing.md" "Structural ensemble generation and post-processing analysis"
 ```
