@@ -37,5 +37,5 @@ flowchart TB
   click E "case_study.md" "Case study: TDP-43 monomer dyamics"
   click F "AF-MIcolab" "AF-MI colab performing software installation, system preparation, AF-MI simulation and post-processing analysis"
   click G "input.md" "Input: Protein sequence,  AF-MI simulation data and parameters"
-  click H "posprocessing.md" "Structural ensemble generation and post-processing analysis"
+  click H "postprocessing.md" "Structural ensemble generation and post-processing analysis"
 ```
