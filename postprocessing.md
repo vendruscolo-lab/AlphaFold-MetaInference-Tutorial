@@ -12,7 +12,7 @@ os.chdir(dir+"/analysis")
 !unzip files.zip
 ```
 
-Run the ```script.sh``` which performs
+Run ```script.sh``` which:
 - Convert dcds to xtc (dcd2xtc.py)
 - Concatenate xtcs to a single xtc ```gmx trjcat -f nosolv_*.xtc -cat -o cat_trjcat.xtc -settime```
 - Calculate the Torrie-Valeau weights (Fullbias.dat) and the CVs (COLVAR) ``` plumed driver --plumed plumed_analysis.dat --mf_xtc cat_trjcat.xtc ``` which are afterwards used to calculate Free Energy Surfaces.
@@ -29,7 +29,7 @@ sh keepH.sh ```
 !ls segment_5_input_af_rebuilt.xtc
 ```
 
-Plot the free energy surfaes per CV of interest. Note that the CV sequence syntax in for in ``` for i in $(echo CV1 CV2 CV3 etc);do``` needs to follow the order these appear in the ```COLVAR``` file.
+Plot the free energy surface per CV of interest. Note that the order of CVs in: ``` for i in $(echo CV1 CV2 CV3 etc);do .. ``` needs to follow the order these CVs appear as columns in the ```COLVAR``` file.
 
 ```python
 #Time depentent FES

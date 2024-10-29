@@ -14,9 +14,9 @@ More information about AlphaFold-Metainference can be found [here](https://www.b
 can be predicted through the distogram head of AlphaFold using this colab [notebook](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb). These
 distances are defined as those between the β carbon atom positions for
 all amino acids except glycine, for which the α carbon atom positions
-were instead used. The multiple sequence alignment (MSA) was conducted
+are instead employed. The multiple sequence alignment (MSA) is conducted
 by MMseqs2 (default setting) on BFD/MGnify and Uniclust30.
-Model 1.1.1 of AlphaFold (default setting) was used for the
+Model 1.1.1 of AlphaFold (default setting) is used for the
 predictions, with no structural templates. AlphaFold describes the
 distribution of inter-residue distances into 64 bins of equal width,
 covering the range from 2.15625 to 21.84375 Å, with the last bin also
@@ -75,21 +75,21 @@ where $E_σ$ corresponds to the energy term associated with the errors
 $$E_{\sigma} = k_{B}T\sum_{r,i}^{N_{R},N_{D}}{- \log{\left( \sigma_{r,i}^{Β} \right) + \frac{1}{2}}\log\left\lbrack \left( \sigma_{r,i}^{Β} \right)^{2} + \left( \sigma_{i}^{SEM} \right)^{2} \right\rbrack}\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (6).$$
 
 Finally, $E_{MD}$ corresponds to the potential energy function of the
-molecular dynamics force field, which in this case is the CALVADOS-2
+molecular dynamics force field, which in this case is the CALVADOS 2
 force field. While the space of conformations $X_r$ is sampled
 through multi-replica simulations (in this tutorial we used six replicas, however the larger this number the better)
 the error parameters for each datapoint $σ_{r,i}^B$ are sampled through a
 Gibbs sampling scheme at each time step. The range of the error
 sampling in this tutorial is set to\[0.0001,10\] and the associated trial move error
-perturbation of the Gibbs sampling was 0.1. For more information on how to select these parameters, refer [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). The error parameter due to
+perturbation of the Gibbs sampling is set 0.1. For more information on how to select these parameters, refer [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). The error parameter due to
 the limited number of replicas used to estimate the forward model
-($σ^{SEM}$) was calculated on the fly by window averaging every 200 steps
+($σ^{SEM}$) is  calculated on the fly by window averaging every 200 steps
 of molecular dynamics.
 
 
 **AF-MI advantages**
 
-By combining AlphaFold inter-resiude distance data with the CALVADOS-2 forcefield to retrieve structural ensembles of proteins are: 
+By combining AlphaFold inter-resiude distance data with the CALVADOS 2 forcefield to retrieve structural ensembles of proteins are: 
 - The high convergence speed due to the coarse grained model and a metadynamics bias
 - The increased accuracy in modeling partially ordered protein interactions relyig on the introduction of AlphaFold-based distance restraints 
 
@@ -117,21 +117,21 @@ the C2 ensemble back-calculated distances.
 
 Using as benchmarking comparison a subset of 6 proteins from Tesei et.
 al. Nature 2024 where we have available experimental Rg data and
-CALVADOS-2 has larger deviations from experimental Rg, we provide with a
+CALVADOS 2 has larger deviations from experimental Rg, we provide with a
 systematic manner of selecting AF distances as restraints in Fig. SX.4.
 This approach shows than when a protein has a Kyte-doolittle hydropathy
 of less than -1.4, signifying hydrophilic character and at least a 5
 residue stretch with plddt\>75, then selecting AF distances with PAE\<10
 has better agreement with experimental Rgs (see NLS, Msh6-NRT).
 Otherwise a PAE\<5 is used (see AN16,CTCF-RD,Eralpha-NTD,CortactinCRH).
-CALVADOS-2 is trained based on residue hydrophobicity and alphafold
+CALVADOS 2 is trained based on residue hydrophobicity and alphafold
 suffers in predicting structures of low plddt regions that are equipped
 with flexible residues. The motivation for the combined hydropathy and
 plddt criterion stems from the fact that if any corrections need to be
 applied either to calvados or to alphafold so that they generate better
 ensembles, these will be where a hydrophobicity-based model alone faces
 challenges in predicting interactions. In Fig. SX4 we show that
-CALVADOS-2 can be assisted by AF-MI in generating ensembles that better
+CALVADOS 2 can be assisted by AF-MI in generating ensembles that better
 agree with Rg data.
 
 Therefore, we use as restraints a subset of the full
