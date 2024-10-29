@@ -150,6 +150,7 @@ For TDP-43 WtoA, the ```plumed.dat``` file can be found [here](https://github.co
 
 ```plumed
 
+    #SOLUTIONFILE=./plumed_TDP-43.dat
     MOLINFO MOLTYPE=protein STRUCTURE=input_af.pdb
     WHOLEMOLECULES ENTITY0=1-414
     
