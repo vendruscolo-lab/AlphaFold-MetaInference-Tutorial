@@ -439,8 +439,7 @@ os.system(f'python {path_gen_analysis}')
 ```
 Similarly the plumed_analysis file is used to calculate the weights using the Torrie valeau weights as done [here](https://link.springer.com/protocol/10.1007/978-1-4939-9608-7_13). For TDP-43 WtoA, the plumed_analysis.dat can be found [here](https://github.com/vendruscolo-lab/AlphaFold-IDP/blob/main/scripts_prep/plumed_analysis_TDP-43.dat)
 
-__Note:__ This tutorial assumes that you know [Parallel Bias Metadynamics](https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html) and [Metainference](https://link.springer.com/content/pdf/10.1007/978-1-4939-9608-7_13.pdf) theory and practice.
-
+__Note:__ This tutorial assumes that you know [Parallel Bias Metadynamics](https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html) and Metainference [theory](https://link.springer.com/content/pdf/10.1007/978-1-4939-9608-7_13.pdf) and [practice](https://www.plumed.org/doc-v2.9/user-doc/html/_m_e_t_a_i_n_f_e_r_e_n_c_e.html).
 
 ### In case you are running the TDP-43 WtoA example:
 

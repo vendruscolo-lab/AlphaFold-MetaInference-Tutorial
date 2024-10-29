@@ -1,0 +1,16 @@
+syntax: 
+  location: 21/001
+  type: internal
+metad: 
+  location: 21/004
+  type: internal
+PBMetaD:
+  location: https://www.plumed.org/doc-v2.9/user-doc/html/_p_b_m_e_t_a_d.html
+  type: external
+Metainference:
+  location: https://www.plumed.org/doc-v2.9/user-doc/html/_m_e_t_a_i_n_f_e_r_e_n_c_e.html
+  type: external
+AF-MI colab:
+  location: https://github.com/vendruscolo-lab/AlphaFold-MetaInference-Tutorial/blob/main/AF-IDP_colab.ipynb
+  type: external
+
