@@ -8,7 +8,7 @@ Since the native states of disordered proteins can be represented in terms of en
 
 ### Theory
 
-More information about AlphaFold-Metainference can be found [here](https://www.biorxiv.org/content/10.1101/2023.01.19.524720v1.full)
+More information about AlphaFold-Metainference can be found [here](https://www.biorxiv.org/content/10.1101/2024.11.09.622758v1)
 
 ***AlphaFold distance map prediction.*** Average inter-residue distances of disordered proteins
 can be predicted through the distogram head of AlphaFold using this colab [notebook](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb). These
