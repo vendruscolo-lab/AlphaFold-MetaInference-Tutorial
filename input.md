@@ -62,7 +62,7 @@ The AF distance map has already been calculated and it is loaded below. We here 
 
 __For arbitrary protein sequences:__
 
-*   Open [this](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb) link and chose colab.
+*   Open [this](https://github.com/zshengyu14/ColabFold_distmats/blob/main/AlphaFold2.ipynb) link and choose colab.
 *   Input the protein sequence  as query sequence.
 *   The rest of the options remain default and cells are run until the end.
 *   Download the link with the AF data and upload it as AF_data in AlphaFold-IDP folder
